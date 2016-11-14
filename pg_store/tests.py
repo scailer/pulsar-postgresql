@@ -82,7 +82,11 @@ class PGPlugin(TestPlugin):
     def on_start(self):
         self.createdb()
         if self.pg_data_sql:
-            self.initdb()
+            try:
+                self.initdb()
+            except Exception as e:
+                print('FALED INIT:', e)
+                raise
 
     def on_end(self):
         self.dropdb()

@@ -2,7 +2,6 @@
 
 from pulsar.utils.config import Global, TestOption
 from pulsar.apps.data import register_store
-from .store import PGStore  # noqa
 
 
 class PGServer(Global):
@@ -25,4 +24,4 @@ class TestPGDataSQL(TestOption):
     desc = "Source files with SQL for init database"
 
 
-register_store('postgresql', 'pg_store.PGStore')
+register_store('postgresql', 'pg_store.store.PGStore')

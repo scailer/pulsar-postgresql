@@ -36,7 +36,7 @@ async def safe(operation, *args, **options):
         return None
 
 
-def timeout_handler(func):
+def error_handler(func):
     @wraps(func)
     async def wrapper(self, *args, **kw):
         try:
@@ -63,12 +63,12 @@ class PGStore(RemoteStore):
     def connect(self, protocol_factory=None):
         return self.pool.acquire()
 
-    @timeout_handler
+    @error_handler
     async def execute(self, *args, **options):
         with await self.pool.cursor() as cur:
             await cur.execute(*args, **options)
 
-    @timeout_handler
+    @error_handler
     async def fetchone(self, *args, **options):
         row = None
 
@@ -78,7 +78,7 @@ class PGStore(RemoteStore):
 
         return row
 
-    @timeout_handler
+    @error_handler
     async def fetchall(self, *args, **options):
         rows = None
 
@@ -88,22 +88,22 @@ class PGStore(RemoteStore):
 
         return rows
 
-    @timeout_handler
+    @error_handler
     async def fetch_scalar(self, *args, **options):
         row = await self.fetchone(*args, **options)
         return row[0]
 
-    @timeout_handler
+    @error_handler
     async def fetch_exist(self, *args, **options):
         row = await self.fetchone(*args, **options)
         return bool(row)
 
-    @timeout_handler
+    @error_handler
     async def fetch_flat(self, *args, **options):
         rows = await self.fetchall(*args, **options)
         return [row[0] for row in rows]
 
-    @timeout_handler
+    @error_handler
     async def fetch_object(self, *args, **options):
         """
             Return dict with column name as keys and data as values
@@ -129,7 +129,7 @@ class PGStore(RemoteStore):
 
         return {col.name: val for col, val in zip(desc, row)}
 
-    @timeout_handler
+    @error_handler
     async def fetch_list(self, *args, **options):
         rows = None
 

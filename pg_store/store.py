@@ -21,7 +21,9 @@ import aiopg
 import logging
 import psycopg2
 
+from functools import wraps
 from pulsar.apps.data import RemoteStore
+from concurrent.futures import TimeoutError
 
 logger = logging.getLogger('pgstore')
 
@@ -32,6 +34,17 @@ async def safe(operation, *args, **options):
     except (psycopg2.Warning, psycopg2.Error) as error:
         logger.error(str(error))
         return None
+
+
+def error_handler(func):
+    @wraps(func)
+    async def wrapper(self, *args, **kw):
+        try:
+            return await func(self, *args, **kw)
+        except (TimeoutError, psycopg2.OperationalError) as exc:
+            logger.error('PG ERROR: \n{}\n{}\n{}'.format(args[0], args[1:], kw))
+            raise
+    return wrapper
 
 
 class PGStore(RemoteStore):
@@ -50,10 +63,12 @@ class PGStore(RemoteStore):
     def connect(self, protocol_factory=None):
         return self.pool.acquire()
 
+    @error_handler
     async def execute(self, *args, **options):
         with await self.pool.cursor() as cur:
             await cur.execute(*args, **options)
 
+    @error_handler
     async def fetchone(self, *args, **options):
         row = None
 
@@ -63,6 +78,7 @@ class PGStore(RemoteStore):
 
         return row
 
+    @error_handler
     async def fetchall(self, *args, **options):
         rows = None
 
@@ -72,18 +88,22 @@ class PGStore(RemoteStore):
 
         return rows
 
+    @error_handler
     async def fetch_scalar(self, *args, **options):
         row = await self.fetchone(*args, **options)
         return row[0]
 
+    @error_handler
     async def fetch_exist(self, *args, **options):
         row = await self.fetchone(*args, **options)
         return bool(row)
 
+    @error_handler
     async def fetch_flat(self, *args, **options):
         rows = await self.fetchall(*args, **options)
         return [row[0] for row in rows]
 
+    @error_handler
     async def fetch_object(self, *args, **options):
         """
             Return dict with column name as keys and data as values
@@ -109,6 +129,7 @@ class PGStore(RemoteStore):
 
         return {col.name: val for col, val in zip(desc, row)}
 
+    @error_handler
     async def fetch_list(self, *args, **options):
         rows = None
 

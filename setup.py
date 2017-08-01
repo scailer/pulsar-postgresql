@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='pulsar-postgresql',
-    version='0.1.1',
+    version='0.1.2',
     author='Dmitriy Vlasov',
     author_email='scailer@yandex.ru',
 

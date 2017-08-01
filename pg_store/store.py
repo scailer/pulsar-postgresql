@@ -54,7 +54,7 @@ class PGStore(RemoteStore):
         self._pool = aiopg.pool.Pool(
             self.buildurl(), minsize=self.pool_size, maxsize=self.pool_size,
             loop=self._loop, timeout=self.timeout, enable_json=True,
-            enable_hstore=True, enable_uuid=True, echo=False)
+            enable_hstore=True, enable_uuid=True, echo=False, on_connect=None)
 
     @property
     def pool(self):

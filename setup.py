@@ -10,7 +10,7 @@ setup(
 
     packages=['pg_store'],
     include_package_data=True,
-    install_requires=['aiopg==0.13.0'],
+    install_requires=['aiopg==0.15.0'],
     requires=['aiopg (>= 0.15.0)', 'pulsar (>= 1.5.4)'],
 
     url='https://github.com/scailer/pulsar-postgresql',

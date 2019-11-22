@@ -10,8 +10,8 @@ setup(
 
     packages=['pg_store'],
     include_package_data=True,
-    install_requires=['aiopg==0.16'],
-    requires=['aiopg (>= 0.16)', 'pulsar (>= 2.0.2)'],
+    install_requires=['aiopg==1.0'],
+    requires=['aiopg (>= 1.0)', 'pulsar (>= 2.0.2)'],
 
     url='https://github.com/scailer/pulsar-postgresql',
     license='MIT license',

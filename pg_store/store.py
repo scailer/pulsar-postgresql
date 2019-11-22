@@ -54,7 +54,7 @@ class PGStore(RemoteStore):
         self.timeout = kwargs.get('timeout', 60.0)
         self._pool = aiopg.pool.Pool(
             self.buildurl(), minsize=self.pool_size, maxsize=self.pool_size,
-            loop=self._loop, timeout=self.timeout, enable_json=True,
+            timeout=self.timeout, enable_json=True,
             enable_hstore=True, enable_uuid=True, echo=False, on_connect=None,
             pool_recycle=-1
         )

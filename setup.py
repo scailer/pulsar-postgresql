@@ -4,14 +4,14 @@ from setuptools import setup
 
 setup(
     name='pulsar-postgresql',
-    version='0.1.2',
+    version='0.2.0',
     author='Dmitriy Vlasov',
     author_email='scailer@yandex.ru',
 
     packages=['pg_store'],
     include_package_data=True,
-    install_requires=['aiopg==0.13.0'],
-    requires=['aiopg', 'pulsar (>= 1.5.4)'],
+    install_requires=['aiopg==0.16'],
+    requires=['aiopg (>= 0.16)', 'pulsar (>= 2.0.2)'],
 
     url='https://github.com/scailer/pulsar-postgresql',
     license='MIT license',

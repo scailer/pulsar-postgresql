@@ -22,6 +22,7 @@ import logging
 import psycopg2
 
 from functools import wraps
+from collections import namedtuple
 from pulsar.apps.data import RemoteStore
 from concurrent.futures import TimeoutError
 
@@ -54,7 +55,9 @@ class PGStore(RemoteStore):
         self._pool = aiopg.pool.Pool(
             self.buildurl(), minsize=self.pool_size, maxsize=self.pool_size,
             loop=self._loop, timeout=self.timeout, enable_json=True,
-            enable_hstore=True, enable_uuid=True, echo=False, on_connect=None)
+            enable_hstore=True, enable_uuid=True, echo=False, on_connect=None,
+            pool_recycle=-1
+        )
 
     @property
     def pool(self):
@@ -141,6 +144,14 @@ class PGStore(RemoteStore):
             return []
 
         return [{col.name: val for col, val in zip(desc, row)} for row in rows]
+
+    async def fetch_inst(self, *args, **options):
+        data = await self.fetch_object(*args, **options)
+        return namedtuple('Obj', data.keys())(**data)
+
+    async def fetch_inst_list(self, *args, **options):
+        data = await self.fetch_list(*args, **options)
+        return [namedtuple('Obj', item.keys())(**item) for item in data]
 
     def safe_fetch_list(self, *args, **options):
         return safe(self.fetch_list, *args, **options)
